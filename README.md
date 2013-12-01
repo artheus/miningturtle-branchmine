@@ -14,7 +14,7 @@ Please, feel free to contribute and give feedback.
 * branchmine - the script which will do the branch-mining
 * compactItems - a tiny script for compacting the items in turtle inventory
 
-#Backlog:
+#Backlog
 
 Support:
 * Put up torches in tunnels
