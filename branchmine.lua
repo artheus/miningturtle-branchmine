@@ -15,6 +15,11 @@ end
 local mineDepth = tonumber(args[1])
 local mineWidth = tonumber(args[2])
 
+local useChests = (turtle.getItemCount(2) > 0)
+local useTorches = (turtle.getItemCount(3) > 0)
+
+local torchStep = 0
+
 local xFromHome = 0
 local yFromHome = 0
 
@@ -67,6 +72,7 @@ function goForward ()
 		end
 	end
 
+	-- Needs to be repeat for sand and gravel
 	repeat
 		turtle.dig()
 	until not turtle.detect()
@@ -85,12 +91,7 @@ function goForward ()
 end
 
 function getDistanceFromHome ()
-	local home = vector.new(0, 0, 0)
-	local pos = vector.new(xFromHome, yFromHome, 0)
-
-	local dist = pos - home
-
-	return dist.x + dist.y
+	return xFromHome + yFromHome
 end
 
 function checkFreeSlots ()
@@ -105,30 +106,46 @@ function checkFreeSlots ()
 	return count
 end
 
+function digUp	()
+
+	if turtle.detectUp() then
+		if checkFreeSlots == 0 then
+                        local exists = false
+                        for i=4,16 do
+                                turtle.select(i)
+                                if turtle.compareUp() then
+                                        exists = true
+                                	break
+                        	end
+                        end
+
+                        if not exists then
+                                print("No more free slots")
+                        	goHome()
+                	end
+		end
+
+        	turtle.digUp()
+	end
+
+end
+
 function digSingle ()
 	if checkFreeSlots() == 0 then shell.run("compactItems") end
 
 	if checkFreeSlots() > 0 then
 		goForward()
-		if turtle.detectUp() then
-			if checkFreeSlots == 0 then
-				local exists = false
-				for i=4,16 do
-					turtle.select(i)
-					if turtle.compareUp() then
-						exists = true
-						break
-					end
-				end
-				
-				if not exists then
-					print("No more free slots")
-					goHome()
-				end
-			end
-			
-			turtle.digUp()
-		end
+		digUp()
+
+		if useTorches then
+                        if torchStep > 5 then
+                                torchStep = 0
+                                turtle.select(3)
+                                turtle.placeUp()
+                        else
+                                torchStep = torchStep + 1
+                        end
+                end
 	else
 		print("No more free slots")
 		goHome()
@@ -198,36 +215,27 @@ function goToX (x)
 
         repeat
             goForward()
+	    digUp()
         until xFromHome == x
     end
 end
 
 function goToY (y)
 	local yDir = (yFromHome == y)
-	if yDir then
-		print("yDir: true")
-	else
-		print("yDir: false")
+	
+	if not yDir then
+        	if yFromHome>y then yDir = 4 end
+        	if yFromHome<y then yDir = 2 end
+
+        	repeat
+           		turnLeft()
+	        until currentDirection == yDir
+
+        	repeat
+            		goForward()
+			digUp()
+	        until yFromHome == y
 	end
-	print("y: "..y)
-	print("yFromHome: "..yFromHome)
-
-    if not yDir then
-        if yFromHome>y then yDir = 4 end
-        if yFromHome<y then yDir = 2 end
-
-		print("yDir: "..yDir)
-
-        repeat
-            turnLeft()
-			print("curDir: "..currentDirection)
-        until currentDirection == yDir
-
-        repeat
-            goForward()
-			print("yFromHome: "..yFromHome)
-        until yFromHome == y
-    end
 end
 
 function goTo (x,y,yFirst)
