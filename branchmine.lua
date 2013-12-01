@@ -27,7 +27,7 @@ end
 
 if mineWidth == nil then
 	print("Using width same as depth "..mineDepth)
-	mineWidth = mineDepth * 3
+	mineWidth = mineDepth * 6 - 2
 end
 
 -- Common functions
