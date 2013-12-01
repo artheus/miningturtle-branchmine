@@ -22,7 +22,5 @@ Support:
 
 Known bugs:
 * Go back to start to refuel/empty inventory
-* Last "Go home" event, should also create 2-in-height tunnels
 * Wait for fuel should not crash
 * Turtle currently ignores slots 2-3, because of future chest and torch support
-* Weird calculations in getDistanceFromHome
